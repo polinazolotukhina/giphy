@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 function App() {
   const [data, setData] = useState("");
   const [err, setErrors] = useState(false);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState({});
   useEffect(() => {
     fetch(
       `https://api.giphy.com/v1/gifs/trending?api_key=PEyIrGaWdf08Lw4nezyXejpD9Y0pO6Rt`
@@ -21,14 +21,25 @@ function App() {
   const deleteItem = id => {
     setData(data.filter(item => item.id !== id));
   };
-  const changeTitle = title => {
+  const changeTitle = id => {
     setData(
       data.map(item =>
-        item.title === title ? Object.assign(item, { title: input }) : item
+        item.id === id && item.id === input.id
+          ? Object.assign(item, { title: input.title })
+          : item
       )
     );
   };
 
+  const handleChange = event => {
+    const { value, name } = event.target;
+    setInput({
+      ...input,
+      title: value,
+      id: name
+    });
+  };
+  console.log("input", input);
   return (
     <div className="App">
       {data &&
@@ -41,8 +52,9 @@ function App() {
             />
             <p>{item.title} </p>
             <input
+              name={item.id}
               onChange={e => {
-                setInput(e.target.value);
+                handleChange(e);
               }}
             />
             <button
@@ -54,7 +66,7 @@ function App() {
             </button>
             <button
               onClick={() => {
-                changeTitle(item.title);
+                changeTitle(item.id);
               }}
             >
               change title
